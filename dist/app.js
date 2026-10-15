@@ -7,11 +7,11 @@ const lessons = [
  {title:'שלילה בלי תרגום מילה במילה',he:'אני לא יודע',en:'I do not know.',explain:'באנגלית לא מצמידים not ישירות לכל פועל. בהווה פשוט עם פועל רגיל משתמשים ב־do not או does not + צורת הבסיס.\nI don’t know. / She doesn’t know.\nעם be לא מוסיפים do: She is not tired.',task:'כתבו באנגלית: היא לא אוהבת קפה.',answers:["she doesn't like coffee",'she does not like coffee',"she doesn’t like coffee"],hint:'אחרי She צריך doesn’t, ואז like בלי s.',answer:"She doesn't like coffee.",transfer:'עכשיו: הם לא יודעים.',accepted:["they don't know",'they do not know',"they don’t know"]}
 ];
 const $ = id => document.getElementById(id);
-let saved; try { saved=JSON.parse(localStorage.getItem('gesher-progress')||'[]'); } catch { saved=[]; }
+let saved; try { saved=JSON.parse(localStorage.getItem('agenteacher-progress')||'[]'); } catch { saved=[]; }
 let completed=new Set(Array.isArray(saved)?saved.filter(x=>Number.isInteger(x)&&x>=0&&x<lessons.length):[]);
 let current=0,stage=0,mode='guided',busy=false,history=[];
 const normal=s=>s.toLowerCase().replace(/[.?!]/g,'').replace(/’/g,"'").replace(/\s+/g,' ').trim();
-function bubble(text,who='teacher'){const box=document.createElement('div');box.className='bubble '+who;box.dir='auto';const label=document.createElement('span');label.className='speaker';label.textContent=who==='user'?'YOU · התור שלך':(mode==='general'?'GESHER · '+activeExpert:'GESHER · המורה שלך');box.append(label);for(const line of text.split('\n')){const row=document.createElement('div');row.dir='auto';row.style.unicodeBidi='plaintext';row.textContent=line||'\u00a0';box.append(row);}$('chat').append(box);$('chat').scrollTop=$('chat').scrollHeight;}
+function bubble(text,who='teacher'){const box=document.createElement('div');box.className='bubble '+who;box.dir='auto';const label=document.createElement('span');label.className='speaker';label.textContent=who==='user'?'YOU · התור שלך':(mode==='general'?'AGENTEACHER · '+activeExpert:'AGENTEACHER · המורה שלך');box.append(label);for(const line of text.split('\n')){const row=document.createElement('div');row.dir='auto';row.style.unicodeBidi='plaintext';row.textContent=line||'\u00a0';box.append(row);}$('chat').append(box);$('chat').scrollTop=$('chat').scrollHeight;}
 function drawNav(){$('lessons').replaceChildren();lessons.forEach((lesson,i)=>{const b=document.createElement('button');b.className=i===current?'selected':'';b.setAttribute('aria-current',i===current?'step':'false');const n=document.createElement('small');n.textContent=completed.has(i)?'✓':String(i+1).padStart(2,'0');const t=document.createElement('strong');t.textContent=lesson.title;b.append(n,t);b.onclick=()=>{if(!busy)start(i)};$('lessons').append(b)});$('progress').textContent=`${completed.size} / ${lessons.length}`;}
 function actions(entries){$('actions').replaceChildren();for(const [text,fn]of entries){const b=document.createElement('button');b.textContent=text;b.onclick=fn;$('actions').append(b)}}
 let activeExpert='שותף לשיחה';
@@ -29,7 +29,7 @@ async function guided(text){
   if(data.spelling_hint)agentCard('SPELLING · רמז לאיות',data.spelling_hint);bubble(data.reply);history=[...pending,{role:'assistant',content:(data.spelling_hint?data.spelling_hint+'\n':'')+data.reply}];$('message').value='';
   if(data.verdict==='correct'){
    if(stage===0){stage=1;history=[];bubble(l.transfer);}
-   else{stage=2;completed.add(current);try{localStorage.setItem('gesher-progress',JSON.stringify([...completed]))}catch{}drawNav();bubble('השלמתם את שני תרגילי הנושא.');actions([['לנושא הבא',()=>start((current+1)%lessons.length)],['לתרגל שוב',()=>start(current)]]);}
+   else{stage=2;completed.add(current);try{localStorage.setItem('agenteacher-progress',JSON.stringify([...completed]))}catch{}drawNav();bubble('השלמתם את שני תרגילי הנושא.');actions([['לנושא הבא',()=>start((current+1)%lessons.length)],['לתרגל שוב',()=>start(current)]]);}
   }
  }catch(err){bubble('לא התקבל משוב: '+err.message+'\nהתשובה נשמרה בשדה, ואפשר לנסות שוב.');}
  finally{setBusy(false);$('message').focus();}
@@ -43,7 +43,7 @@ function startGeneral(){history=[];$('chat').replaceChildren();$('message').valu
 for(const name of ['guided','ai','general'])$(name).onclick=()=>{if(busy)return;mode=name;for(const n of ['guided','ai','general'])$(n).classList.toggle('active',n===name);$('expert-panel').hidden=name!=='general';document.querySelector('.comparison').hidden=name==='general';$('lessons').hidden=name==='general';$('message').placeholder=name==='general'?'על מה תרצו לדבר? אפשר לכתוב באנגלית…':'כאן כותבים באנגלית…';$('footnote').textContent=name==='general'?'שיחת תפקיד עם AI · הסבר קצר על טעות מרכזית, בלי לחשוף את התיקון אלא אם מבקשים.':'טעות היא נקודת התחלה. נבין אותה יחד, משפט אחד בכל פעם.';$('mode-note').textContent=name==='general'?'שיחה חופשית + עזרה באנגלית':name==='ai'?'מורה לאנגלית · Ollama מקומי':'תרגילים מובנים · משוב מהמודל';start(current);};
 $('expert').onchange=()=>{$('custom-expert').hidden=$('expert').value!=='custom';};
 $('new-general').onclick=()=>{if(busy)return;const value=$('expert').value==='custom'?$('custom-expert').value.trim():$('expert').value;if(!value){$('custom-expert').focus();return;}activeExpert=value;startGeneral();};
-$('refresh').onclick=refresh;$('reset').onclick=()=>{if(confirm('לאפס את ההתקדמות בכל הנושאים?')){completed.clear();try{localStorage.removeItem('gesher-progress')}catch{}start(0)}};start(0);
+$('refresh').onclick=refresh;$('reset').onclick=()=>{if(confirm('לאפס את ההתקדמות בכל הנושאים?')){completed.clear();try{localStorage.removeItem('agenteacher-progress')}catch{}start(0)}};start(0);
 
 $('model-panel').hidden=false;$('mode-note').textContent='תרגילים מובנים · משוב מהמודל';refresh();
 

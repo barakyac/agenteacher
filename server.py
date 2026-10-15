@@ -139,5 +139,5 @@ Exercise context: """ + json.dumps(exercise, ensure_ascii=False)
 
 if __name__ == '__main__':
     server = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
-    print(f'Gesher is ready: http://127.0.0.1:{PORT}', flush=True)
+    print(f'agenteacher is ready: http://127.0.0.1:{PORT}', flush=True)
     server.serve_forever()

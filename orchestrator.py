@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parent
-COACH_MODEL = os.environ.get('GESHER_COACH_MODEL', 'qwen3.5:4b')
+COACH_MODEL = os.environ.get('AGENTEACHER_COACH_MODEL', 'qwen3.5:4b')
 
 
 class OrchestratorAgent:

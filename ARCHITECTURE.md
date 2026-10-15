@@ -1,4 +1,4 @@
-# Gesher system architecture
+# agenteacher system architecture
 
 Current local implementation, inspected 15 October 2026. All runtime services shown run on the user's Mac. Four roles in general chat means one code orchestrator and three model calls, not four independent model installations.
 

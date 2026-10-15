@@ -1,4 +1,4 @@
-# Gesher / גשר
+# agenteacher
 
 A local, editable English-teacher POC for adult Hebrew speakers with basic English.
 
@@ -7,7 +7,7 @@ A local, editable English-teacher POC for adult Hebrew speakers with basic Engli
 Requires Python 3.10+; no Python or JavaScript packages to install.
 
 ```sh
-cd gesher
+cd agenteacher
 python3 server.py
 ```
 
@@ -35,7 +35,7 @@ Topics: present-tense be; attributive adjective order; do/does questions; habits
 - `dist/style.css`: responsive RTL interface.
 - `dist/index.html`: accessible application markup.
 
-Progress is stored in browser localStorage (`gesher-progress`). Conversation is kept in page memory only and resets when switching topics/modes or reloading. AI requests include the selected topic and at most the latest 28 conversation messages; this is not durable learner memory. No accounts or database. Python's development HTTP server is not intended for public deployment.
+Progress is stored in browser localStorage (`agenteacher-progress`). Conversation is kept in page memory only and resets when switching topics/modes or reloading. AI requests include the selected topic and at most the latest 28 conversation messages; this is not durable learner memory. No accounts or database. Python's development HTTP server is not intended for public deployment.
 
 ## Verification
 
@@ -60,7 +60,7 @@ The third tab, צ׳אט כללי, supports a general conversation partner, techn
 
 `orchestrator.py` implements three roles: a deterministic OrchestratorAgent dispatches a conversation agent (selected model, normally 9b) and a grammar coach (4b by default). There is no third LLM planning call; orchestration owns concurrent dispatch, validated coach output, independent errors, cancellation of event delivery, and a 100-second overall deadline. Worker HTTP reads time out after 90 seconds. Disconnects stop delivery but may not immediately cancel an inference already running inside Ollama.
 
-The server streams newline-delimited JSON. The conversation card updates token by token; the independent coach card shows its hint as soon as ready. A failed grammar check never appears as a passed check. Conversation history includes successful hints for follow-up questions. Model roles have separate prompts in `conversation-prompt.md` and `coach-prompt.md`. Set `GESHER_COACH_MODEL` before starting the server to override the coach model. Install that model before use; failures remain visible rather than silently skipping review.
+The server streams newline-delimited JSON. The conversation card updates token by token; the independent coach card shows its hint as soon as ready. A failed grammar check never appears as a passed check. Conversation history includes successful hints for follow-up questions. Model roles have separate prompts in `conversation-prompt.md` and `coach-prompt.md`. Set `AGENTEACHER_COACH_MODEL` before starting the server to override the coach model. Install that model before use; failures remain visible rather than silently skipping review.
 
 Concurrent HTTP requests do not guarantee concurrent GPU execution: Ollama scheduling and memory affect speed. One local run of `i want many money` with 9b + 4b returned the coach hint in 6.6s, first conversation text in 11.6s, and completed in 13.0s. This is a smoke measurement, not a latency guarantee or controlled comparison. Grammar judgments remain model-generated and can be wrong. Verify with `python3 -m unittest test_orchestrator.py` (parallel dispatch and independent failure handling).
 
