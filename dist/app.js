@@ -48,6 +48,7 @@ $('refresh').onclick=refresh;$('reset').onclick=()=>{if(confirm('לאפס את �
 $('model-panel').hidden=false;$('mode-note').textContent='תרגילים מובנים · משוב מהמודל';refresh();
 
 function agentCard(title, initial){const box=document.createElement('div');box.className='bubble teacher';const label=document.createElement('span');label.className='speaker';label.textContent=title;const body=document.createElement('div');body.dir='auto';body.style.unicodeBidi='plaintext';body.textContent=initial;box.append(label,body);$('chat').append(box);return body;}
+function renderCoachHint(el,text){el.replaceChildren();const lines=(text||'').split('\n');const main=document.createElement('div');main.textContent=lines[0];el.append(main);if(lines[1]){const fix=document.createElement('div');fix.className='correction';const tag=document.createElement('span');tag.className='correction-tag';tag.textContent='המשפט הנכון';const sentence=document.createElement('span');sentence.className='correction-text';sentence.dir='ltr';sentence.textContent=lines[1];fix.append(tag,sentence);el.append(fix);}}
 async function sendTeam(text){
  if(busy)return;if(!$('model').value){bubble('בחרו מודל מקומי פעיל.');return;}
  const pending=[...history,{role:'user',content:text}];bubble(text,'user');
@@ -60,7 +61,7 @@ async function sendTeam(text){
   if(e.agent==='spelling'&&e.type==='error'){spellingFinished=true;spelling.textContent=e.message;}
   if(e.type==='blocked'){blocked=true;completed=true;conversation.textContent=e.message||'ההודעה לא נשלחה לשיחה: כתבו בעברית או באנגלית.';coach.textContent='בדיקת הדקדוק לא הוצגה.';}
   if(e.agent==='conversation'&&e.type==='delta'){answer+=e.text;conversation.textContent=answer;}
-  if(e.agent==='coach'&&e.type==='result'){coachFinished=true;hint=e.status==='hint'?e.hint:'';coach.textContent=hint||(e.status==='ok'?'לא זוהתה טעות דקדוקית ברורה.':'אין טקסט באנגלית לבדיקה.');}
+  if(e.agent==='coach'&&e.type==='result'){coachFinished=true;hint=e.status==='hint'?e.hint:'';renderCoachHint(coach,hint||(e.status==='ok'?'לא זוהתה טעות דקדוקית ברורה.':'אין טקסט באנגלית לבדיקה.'));}
   if(e.type==='error'){if(e.agent==='coach'){coachFinished=true;coach.textContent=e.message;}else if(e.agent==='conversation'){conversationFailed=true;conversation.textContent=(answer?answer+'\n\n':'')+e.message;}}
   if(e.type==='complete')completed=true;
   $('chat').scrollTop=$('chat').scrollHeight;

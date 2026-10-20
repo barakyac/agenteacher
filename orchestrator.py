@@ -76,8 +76,12 @@ class OrchestratorAgent:
             raise ValueError('Invalid spelling response')
         if result['allowed'] == (result['status']=='blocked') or (result['status']=='hint' and not result['hint'].strip()):
             raise ValueError('Inconsistent spelling response')
-        if not result['allowed']:
-            result['hint']='אפשר לכתוב רק בעברית או באנגלית. Please use Hebrew or English only.'
+        # Still query and surface the comment, but never block the message.
+        if result['status']=='blocked':
+            result['status']='hint'
+            if not result['hint'].strip():
+                result['hint']='אפשר לכתוב רק בעברית או באנגלית. Please use Hebrew or English only.'
+        result['allowed']=True
         self.emit('spelling','result',**result)
 
     def worker(self, name, action):
