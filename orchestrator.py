@@ -37,7 +37,7 @@ class OrchestratorAgent:
                                {'Content-Type': 'application/json'}), timeout=90)
 
     def conversation(self):
-        prompt = (ROOT/'conversation-prompt.md').read_text()+'\nRequested role: '+self.expert
+        prompt = (ROOT/'agents/conversation-prompt.md').read_text()+'\nRequested role: '+self.expert
         with self.call(self.model, prompt, self.messages, stream=True) as response:
             ended = False
             for line in response:
@@ -60,7 +60,7 @@ class OrchestratorAgent:
             'status':{'type':'string','enum':['hint','ok','not_english']},
             'hint':{'type':'string'}}, 'required':['status','hint'], 'additionalProperties':False}
         # A short original conversation excerpt helps resolve fragments and references.
-        with self.call(COACH_MODEL, (ROOT/'coach-prompt.md').read_text(), self.messages[-5:], schema=schema) as response:
+        with self.call(COACH_MODEL, (ROOT/'agents/coach-prompt.md').read_text(), self.messages[-5:], schema=schema) as response:
             result = json.loads(json.load(response)['message']['content'])
         if result.get('status') not in ('hint','ok','not_english') or not isinstance(result.get('hint'),str):
             raise ValueError('Invalid coaching response')
@@ -70,7 +70,7 @@ class OrchestratorAgent:
 
     def spelling(self):
         schema={'type':'object','properties':{'allowed':{'type':'boolean'},'status':{'type':'string','enum':['hint','ok','blocked']},'hint':{'type':'string'}},'required':['allowed','status','hint'],'additionalProperties':False}
-        with self.call(COACH_MODEL,(ROOT/'spelling-prompt.md').read_text(),[self.messages[-1]],schema=schema) as response:
+        with self.call(COACH_MODEL,(ROOT/'agents/spelling-prompt.md').read_text(),[self.messages[-1]],schema=schema) as response:
             result=json.loads(json.load(response)['message']['content'])
         if not isinstance(result.get('allowed'),bool) or result.get('status') not in ('hint','ok','blocked') or not isinstance(result.get('hint'),str):
             raise ValueError('Invalid spelling response')

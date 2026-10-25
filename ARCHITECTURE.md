@@ -79,9 +79,9 @@ flowchart LR
 | HTTP server, validation, mode routing, teaching workflow | `server.py` |
 | Parallel dispatch, output gating, timeouts | `orchestrator.py` |
 | Fast script validation | `language_guard.py` |
-| Teacher instructions | `teacher-prompt.md` plus guided policy in `server.py` |
-| Conversation instructions | `conversation-prompt.md` |
-| Grammar instructions | `coach-prompt.md` |
-| Spelling and semantic language instructions | `spelling-prompt.md` |
+| Teacher instructions | `agents/teacher-prompt.md` plus guided policy in `server.py` |
+| Conversation instructions | `agents/conversation-prompt.md` |
+| Grammar instructions | `agents/coach-prompt.md` |
+| Spelling and semantic language instructions | `agents/spelling-prompt.md` |
 | Earlier combined prompt, no longer used by active general-chat route | `general-prompt.md` |
 | Concurrency, failure isolation, blocking, script tests | `test_orchestrator.py` |

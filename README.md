@@ -30,7 +30,7 @@ Topics: present-tense be; attributive adjective order; do/does questions; habits
 ## Source map
 
 - `server.py`: standard-library HTTP server, local model discovery and chat proxy; bound to loopback only.
-- `teacher-prompt.md`: editable bilingual teaching instructions.
+- `agents/teacher-prompt.md`: editable bilingual teaching instructions.
 - `dist/app.js`: lesson content, practice checks, progress, chat interaction.
 - `dist/style.css`: responsive RTL interface.
 - `dist/index.html`: accessible application markup.
@@ -60,13 +60,13 @@ The third tab, צ׳אט כללי, supports a general conversation partner, techn
 
 `orchestrator.py` implements three roles: a deterministic OrchestratorAgent dispatches a conversation agent (selected model, normally 9b) and a grammar coach (4b by default). There is no third LLM planning call; orchestration owns concurrent dispatch, validated coach output, independent errors, cancellation of event delivery, and a 100-second overall deadline. Worker HTTP reads time out after 90 seconds. Disconnects stop delivery but may not immediately cancel an inference already running inside Ollama.
 
-The server streams newline-delimited JSON. The conversation card updates token by token; the independent coach card shows its hint as soon as ready. A failed grammar check never appears as a passed check. Conversation history includes successful hints for follow-up questions. Model roles have separate prompts in `conversation-prompt.md` and `coach-prompt.md`. Set `AGENTEACHER_COACH_MODEL` before starting the server to override the coach model. Install that model before use; failures remain visible rather than silently skipping review.
+The server streams newline-delimited JSON. The conversation card updates token by token; the independent coach card shows its hint as soon as ready. A failed grammar check never appears as a passed check. Conversation history includes successful hints for follow-up questions. Model roles have separate prompts in `agents/conversation-prompt.md` and `agents/coach-prompt.md`. Set `AGENTEACHER_COACH_MODEL` before starting the server to override the coach model. Install that model before use; failures remain visible rather than silently skipping review.
 
 Concurrent HTTP requests do not guarantee concurrent GPU execution: Ollama scheduling and memory affect speed. One local run of `i want many money` with 9b + 4b returned the coach hint in 6.6s, first conversation text in 11.6s, and completed in 13.0s. This is a smoke measurement, not a latency guarantee or controlled comparison. Grammar judgments remain model-generated and can be wrong. Verify with `python3 -m unittest test_orchestrator.py` (parallel dispatch and independent failure handling).
 
 ## Spelling and permitted languages
 
-A fourth role, the spelling/language agent (`spelling-prompt.md`, local 4b), checks spelling independently of grammar. General chat runs all three model workers concurrently, but the orchestrator buffers conversation/grammar output until the spelling agent accepts the language. Rejected messages are not committed to chat history. The model calls may already have started locally; rejection suppresses their output. Teacher modes perform the same semantic language check before generating a reply.
+A fourth role, the spelling/language agent (`agents/spelling-prompt.md`, local 4b), checks spelling independently of grammar. General chat runs all three model workers concurrently, but the orchestrator buffers conversation/grammar output until the spelling agent accepts the language. Rejected messages are not committed to chat history. The model calls may already have started locally; rejection suppresses their output. Teacher modes perform the same semantic language check before generating a reply.
 
 `language_guard.py` immediately rejects letters outside English ASCII and Hebrew, including mixed-script messages; Hebrew vowel marks, numbers, punctuation and emoji are supported. This intentionally strict alphabet restriction also excludes accented Latin letters. ASCII French/Spanish/etc. are checked by the local model, so semantic enforcement is best-effort; ambiguous short words, names and misspelled English should remain usable. Language-check errors do not count as a pass. An extra model request can increase latency; no new speed claim has been measured.
 

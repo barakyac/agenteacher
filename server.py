@@ -61,7 +61,7 @@ class Handler(SimpleHTTPRequestHandler):
             mode = data.get('mode', 'teacher')
             if mode not in ('teacher', 'general'):
                 raise ValueError('Invalid chat mode')
-            system_prompt = (ROOT / 'teacher-prompt.md').read_text()
+            system_prompt = (ROOT / 'agents/teacher-prompt.md').read_text()
             if mode == 'general':
                 expert = data.get('expert', 'שותף לשיחה')
                 if not isinstance(expert, str) or not 1 <= len(expert.strip()) <= 200 or data.get('exercise') is not None:
