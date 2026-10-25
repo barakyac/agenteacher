@@ -40,6 +40,9 @@ CASES = [
         {'role': 'assistant', 'content': 'באנגלית צריך פועל שמקשר בין הנושא לתיאור. איזו צורה מתאימה ל-she?\nShe is busy.'},
         {'role': 'user', 'content': 'מה המשפט הנכון?'},
      ]),
+
+    ("Tense-mismatch sentence with a spelling typo -- coach should not just fix the typo and ignore the clashing future/conditional perfect continuous forms",
+     [{'role': 'user', 'content': 'I will have been going to the gym, by the time you would have been going to school tommorow'}]),
 ]
 
 

@@ -42,6 +42,9 @@ CASES = [
 
     ("Real learner question with no spelling issue",
      'how much water to buy?'),
+
+    ("Long compound-tense sentence with one embedded typo -- should flag 'tommorow' without being thrown off by sentence complexity",
+     'I will have been going to the gym, by the time you would have been going to school tommorow'),
 ]
 
 
